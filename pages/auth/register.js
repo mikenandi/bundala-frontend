@@ -23,41 +23,48 @@ import Router from "next/router";
 
 function Register() {
 	// usestates for storing values of form inputs.
-	const [name, set_name] = useState("");
-	const [email, set_email] = useState("");
-	const [password, set_password] = useState("");
+	const [answer, set_answer] = useState([]);
 
-	// function for getting name value from form.
-	const handleName = (e) => {
-		set_name(e.target.value);
+	// handling change from form.
+	const handleChange = (e) => {
+		const name = e.target.name;
+		const value = e.target.value;
+
+		set_answer({...answer, [name]: value});
 	};
 
-	// function to get email value from form
-	const handleEmail = (e) => {
-		set_email(e.target.value);
-	};
-
-	// function to get password value from form.
-	const handlePassword = (e) => {
-		set_password(e.target.value);
-	};
-
+	console.log(answer);
 	// function to send register https request.
-	const handleSignup = (e) => {
+	const handleSubmit = (e) => {
 		e.preventDefault();
 
 		axios({
-			url: "http://localhost:1337/api/v1/signup",
+			url: "http://localhost:1337/api/v1/register",
 			method: "POST",
 			data: {
-				email: email,
-				password: password,
+				first_name: answer.first_name,
+				last_name: answer.last_name,
+				email: answer.email,
+				password: answer.password,
 			},
 		})
 			.then((response) => {
 				if (response.data.success) {
-					// localStorage.setItem("authToken", response.data.token);
-					Router.push("/admin/dashboard");
+					console.log(response.data.data);
+					// saving auth details on local storage for future usage.
+					localStorage.setItem("authToken", response.data.data.token);
+					localStorage.setItem("userId", response.data.data.user_id);
+					localStorage.setItem("role", response.data.data.role);
+
+					// if credentials are for admin then the person should login as admin.
+					if (response.data.data.role === "admin")
+						return Router.push("/admin/dashboard");
+
+					if (response.data.data.role === "payer")
+						return Router.push("/payer-dashboard");
+
+					if (response.data.data.role === "service_provider")
+						return Router.push("/service-provider");
 				}
 			})
 			.catch((error) => {
@@ -84,10 +91,27 @@ function Register() {
 										</InputGroupText>
 									</InputGroupAddon>
 									<Input
-										placeholder='Name'
+										placeholder='First name'
 										type='text'
-										value={name}
-										onChange={handleName}
+										name='first_name'
+										answer={answer}
+										onChange={handleChange}
+									/>
+								</InputGroup>
+							</FormGroup>
+							<FormGroup>
+								<InputGroup className='input-group-alternative mb-3'>
+									<InputGroupAddon addonType='prepend'>
+										<InputGroupText>
+											<i className='ni ni-hat-3' />
+										</InputGroupText>
+									</InputGroupAddon>
+									<Input
+										placeholder='Last name'
+										type='text'
+										name='last_name'
+										answer={answer}
+										onChange={handleChange}
 									/>
 								</InputGroup>
 							</FormGroup>
@@ -101,8 +125,9 @@ function Register() {
 									<Input
 										placeholder='Email'
 										type='email'
-										value={email}
-										onChange={handleEmail}
+										name='email'
+										onChange={handleChange}
+										answer={answer}
 										autoComplete='new-email'
 									/>
 								</InputGroup>
@@ -117,8 +142,9 @@ function Register() {
 									<Input
 										placeholder='Password'
 										type='password'
-										value={password}
-										onChange={handlePassword}
+										name='password'
+										onChange={handleChange}
+										answer={answer}
 										autoComplete='new-password'
 									/>
 								</InputGroup>
@@ -150,7 +176,7 @@ function Register() {
 									className='mt-4'
 									color='primary'
 									type='button'
-									onClick={handleSignup}>
+									onClick={handleSubmit}>
 									Create account
 								</Button>
 							</div>

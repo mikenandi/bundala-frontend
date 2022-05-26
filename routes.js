@@ -19,7 +19,7 @@ var routes = [
 	},
 	{
 		path: "/tables",
-		name: "Reports",
+		name: "Street codes",
 		icon: "ni ni-bullet-list-67 text-info",
 		layout: "/admin",
 	},

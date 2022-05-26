@@ -20,10 +20,11 @@ import Admin from "layouts/Admin.js";
 import Header from "components/Headers/Header.js";
 import UserHeader from "components/Headers/UserHeader.js";
 import axios from "axios";
+import Router from "next/router";
 
 function RegisterLocation() {
 	// response message
-	const [err, set_err] = React.useState("");
+	const [errmsg, set_errmsg] = React.useState("");
 	const [msg, set_msg] = React.useState("");
 	// storing states
 	const [answer, setanswer] = React.useState([]);
@@ -38,51 +39,75 @@ function RegisterLocation() {
 	// function to send http request to register location.
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		axios({
-			method: "POST",
-			url: "http://localhost:1337/api/v1/register-location",
-			data: {
-				region: answer.region,
-				district: answer.district,
-				ward: answer.ward,
-				street: answer.street,
-			},
-		})
-			.then((response) => {
-				if (response.data.success) {
-					set_msg("success you have registered new location");
-					setanswer([]);
-				}
-				console.log(response);
+
+		// -- checking if all fields are filled.
+		if (answer.region && answer.district && answer.ward && answer.street) {
+			axios({
+				method: "POST",
+				url: "http://localhost:1337/api/v1/register-location",
+				data: {
+					region: answer.region,
+					district: answer.district,
+					ward: answer.ward,
+					street: answer.street,
+				},
 			})
-			.catch((error) => {
-				if (error.response) {
-					set_err("OOps locations was not created.");
-				}
-				console.log(error);
-			});
+				.then((response) => {
+					if (response.data.success) {
+						set_msg("success you have registered new location");
+						setTimeout(() => {
+							set_msg("");
+							setanswer({
+								region: "",
+								district: "",
+								ward: "",
+								street: "",
+							});
+						}, 3000);
+					}
+				})
+				.catch((error) => {
+					if (error.response) {
+						set_errmsg(error.response.data.message);
+
+						setTimeout(() => {
+							set_errmsg("");
+						}, 10000);
+					}
+				});
+		} else {
+			set_errmsg("please fill all fields before submiting.");
+
+			setTimeout(() => {
+				set_errmsg("");
+			}, 5000);
+		}
 	};
-	console.log(answer);
+
 	return (
 		<>
 			<Header />
 
 			{/* Page content */}
 			<Container className='mt-5' fluid>
-				{/* <p className='text-danger'>
-					<strong>{err}</strong>
-				</p> */}
-				<p className='text-success'>
-					<strong>{msg}</strong>
-				</p>
 				<Form className='form col-lg-6 offset-lg-3'>
+					{msg && (
+						<div class='alert alert-success' role='alert'>
+							{msg}
+						</div>
+					)}
+					{errmsg && (
+						<div class='alert alert-danger' role='alert'>
+							{errmsg}
+						</div>
+					)}
 					<FormGroup>
 						<Label for='exampleEmail'>Region</Label>
 						<Input
 							type='text'
 							name='region'
 							onChange={handleChange}
-							answer={answer}
+							value={answer.region}
 							placeholder='Dar es salaam'
 						/>
 					</FormGroup>
@@ -92,7 +117,7 @@ function RegisterLocation() {
 							type='text'
 							name='district'
 							onChange={handleChange}
-							answer={answer}
+							value={answer.district}
 							placeholder='Ubungo'
 						/>
 					</FormGroup>
@@ -102,7 +127,7 @@ function RegisterLocation() {
 							type='text'
 							name='ward'
 							onChange={handleChange}
-							answer={answer}
+							value={answer.ward}
 							placeholder='Mabibo'
 						/>
 					</FormGroup>{" "}
@@ -112,7 +137,7 @@ function RegisterLocation() {
 							type='text'
 							name='street'
 							onChange={handleChange}
-							answer={answer}
+							value={answer.street}
 							placeholder='Mwembeni'
 						/>
 					</FormGroup>

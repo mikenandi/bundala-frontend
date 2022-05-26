@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
 // reactstrap components
 import {
@@ -22,12 +22,13 @@ import Router from "next/router";
 
 function Login() {
 	// setting values
-	const [email, set_email] = useState("");
+	const [errmsg, set_errmsg] = useState("");
+	const [username, set_username] = useState("");
 	const [password, set_password] = useState("");
 
 	// function for updating value of email.
-	const handleEmail = (e) => {
-		set_email(e.target.value);
+	const handleUsername = (e) => {
+		set_username(e.target.value);
 	};
 
 	// function for updating value of password.
@@ -37,27 +38,76 @@ function Login() {
 
 	// function to send http request to server login
 	const handleLogin = (e) => {
-		e.preventDefault();
-		axios({
-			method: "POST",
-			url: "http://localhost:1337/api/v1/login",
-			data: {
-				email: email,
-				password: password,
-			},
-		})
-			.then((response) => {
-				if (response.data.success) {
-					// localStorage.setItem("authToken", response.data.token);
-					Router.push("/admin/dashboard");
-				}
+		e.preventDefault(); // preventing default behaviour.
+
+		// Checking if value of username or password are empty.
+
+		if (!(username && password)) {
+			set_errmsg("username or password is submited empty.");
+			setTimeout(() => {
+				set_errmsg("");
+			}, 5000);
+		}
+
+		if (username && password) {
+			axios({
+				method: "POST",
+				url: "http://localhost:1337/api/v1/login",
+				data: {
+					username: username,
+					password: password,
+				},
 			})
-			.catch((error) => console.log(error));
+				.then((response) => {
+					if (response.data.success) {
+						localStorage.setItem("authToken", response.data.data.token);
+						localStorage.setItem("userId", response.data.data.user_id);
+						localStorage.setItem("role", response.data.data.role);
+
+						if (response.data.data.role === "admin")
+							return Router.push("/admin/dashboard");
+
+						if (response.data.data.role === "payer")
+							return Router.push("/payer-dashboard");
+
+						if (response.data.data.role === "service_provider")
+							return Router.push("/service-provider");
+					}
+				})
+				.catch((error) => {
+					if (error.response) {
+						if (error.response.data.code === "wrong_password") {
+							set_errmsg("wrong password");
+							setTimeout(() => {
+								set_errmsg("");
+							}, 10000);
+						}
+						if (error.response.data.code === "username_not_found") {
+							set_errmsg("wrong username");
+							setTimeout(() => {
+								set_errmsg("");
+							}, 10000);
+						}
+					}
+				});
+		}
 	};
 
 	return (
 		<>
 			<Col lg='5' md='7'>
+				{errmsg && (
+					<Card
+						className='shadow border-0 mb-3'
+						style={{backgroundColor: "#FFE6E6"}}>
+						<CardBody className='px-lg-5 py-lg-5'>
+							<p className='text-danger'>
+								<strong>{errmsg}</strong>
+							</p>
+						</CardBody>
+					</Card>
+				)}
+
 				<Card className='bg-secondary shadow border-0'>
 					<CardHeader className='bg-transparent pb-2'>
 						<div className='text-black text-center mt-2 mb-3'>
@@ -74,11 +124,10 @@ function Login() {
 										</InputGroupText>
 									</InputGroupAddon>
 									<Input
-										placeholder='Email'
-										type='email'
-										value={email}
-										onChange={handleEmail}
-										autoComplete='new-email'
+										placeholder='username'
+										type='text'
+										value={username}
+										onChange={handleUsername}
 									/>
 								</InputGroup>
 							</FormGroup>

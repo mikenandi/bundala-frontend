@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 
 // reactstrap components
 import {
@@ -17,8 +17,39 @@ import {
 import Admin from "layouts/Admin.js";
 // core components
 import UserHeader from "components/Headers/UserHeader.js";
+import axios from "axios";
 
 function Profile() {
+	// setting initial states
+	const [profile, set_profile] = useState({
+		firstname: "admin",
+		lastname: "mars",
+		email: "admin@mars.com",
+		username: "admin@mars.com",
+	});
+
+	// Fetching profile data.
+	useEffect(() => {
+		axios({
+			method: "GET",
+			url: "http://localhost:1337/api/v1/user-profile",
+			params: {
+				user_id: localStorage.getItem("userId"),
+			},
+		})
+			.then((response) => {
+				set_profile({
+					firstname: response.data.data.first_name,
+					lastname: response.data.data.last_name,
+					email: response.data.data.email,
+					username: response.data.data.username,
+				});
+			})
+			.catch((error) => {
+				console.log(error.response);
+			});
+	}, []);
+
 	return (
 		<>
 			<UserHeader />
@@ -27,33 +58,17 @@ function Profile() {
 				<Row>
 					<Col className='order-xl-2 mb-5 mb-xl-0' xl='4'>
 						<Card className='card-profile shadow'>
-							<Row className='justify-content-center'>
-								<Col className='order-lg-2' lg='3'>
-									<div className='card-profile-image'>
-										<a href='#pablo' onClick={(e) => e.preventDefault()}>
-											{/* <img
-												alt='...'
-												className='rounded-circle'
-												src={require("assets/img/theme/team-4-800x800.jpg")}
-											/> */}
-										</a>
-									</div>
-								</Col>
-							</Row>
-							<CardHeader className='text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4'>
-								<div className='d-flex justify-content-between'></div>
-							</CardHeader>
 							<CardBody className='pt-0 pt-md-4'>
-								<div className='mt-6 text-center'>
+								<div className='mt-3 text-start'>
 									<h3>
-										Admin name
-										<span className='font-weight-light'>, 27</span>
+										{profile.firstname} {profile.lastname}
 									</h3>
 									<div className='h5 font-weight-300'>
 										<i className='ni location_pin mr-2' />
 										Dar es salaam, Tanzania
 									</div>
-									<div className='h5 mt-4'>
+									<hr />
+									<div className='h5 '>
 										<i className='ni business_briefcase-24 mr-2' />
 										System Admin - Usafi billz.
 									</div>
@@ -72,15 +87,6 @@ function Profile() {
 									<Col xs='8'>
 										<h3 className='mb-0'>My account</h3>
 									</Col>
-									<Col className='text-right' xs='4'>
-										<Button
-											color='primary'
-											href='#pablo'
-											onClick={(e) => e.preventDefault()}
-											size='sm'>
-											Settings
-										</Button>
-									</Col>
 								</Row>
 							</CardHeader>
 							<CardBody>
@@ -98,11 +104,13 @@ function Profile() {
 														Username
 													</label>
 													<Input
-														className='form-control-alternative'
+														className='form-control-alternative bg-white'
 														defaultValue='lucky.jesse'
 														id='input-username'
 														placeholder='Username'
 														type='text'
+														value={profile.username}
+														disabled
 													/>
 												</FormGroup>
 											</Col>
@@ -114,10 +122,12 @@ function Profile() {
 														Email address
 													</label>
 													<Input
-														className='form-control-alternative'
+														className='form-control-alternative bg-white'
 														id='input-email'
 														placeholder='jesse@example.com'
 														type='email'
+														value={profile.email}
+														disabled
 													/>
 												</FormGroup>
 											</Col>
@@ -131,11 +141,13 @@ function Profile() {
 														First name
 													</label>
 													<Input
-														className='form-control-alternative'
+														className='form-control-alternative bg-white'
 														defaultValue='Lucky'
 														id='input-first-name'
 														placeholder='First name'
 														type='text'
+														value={profile.firstname}
+														disabled
 													/>
 												</FormGroup>
 											</Col>
@@ -147,105 +159,17 @@ function Profile() {
 														Last name
 													</label>
 													<Input
-														className='form-control-alternative'
+														className='form-control-alternative bg-white'
 														defaultValue='Jesse'
 														id='input-last-name'
 														placeholder='Last name'
 														type='text'
+														value={profile.lastname}
+														disabled
 													/>
 												</FormGroup>
 											</Col>
 										</Row>
-									</div>
-									<hr className='my-4' />
-									{/* Address */}
-									<h6 className='heading-small text-muted mb-4'>
-										Contact information
-									</h6>
-									<div className='pl-lg-4'>
-										<Row>
-											<Col md='12'>
-												<FormGroup>
-													<label
-														className='form-control-label'
-														htmlFor='input-address'>
-														Address
-													</label>
-													<Input
-														className='form-control-alternative'
-														defaultValue='Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09'
-														id='input-address'
-														placeholder='Home Address'
-														type='text'
-													/>
-												</FormGroup>
-											</Col>
-										</Row>
-										<Row>
-											<Col lg='4'>
-												<FormGroup>
-													<label
-														className='form-control-label'
-														htmlFor='input-city'>
-														City
-													</label>
-													<Input
-														className='form-control-alternative'
-														defaultValue='New York'
-														id='input-city'
-														placeholder='City'
-														type='text'
-													/>
-												</FormGroup>
-											</Col>
-											<Col lg='4'>
-												<FormGroup>
-													<label
-														className='form-control-label'
-														htmlFor='input-country'>
-														Country
-													</label>
-													<Input
-														className='form-control-alternative'
-														defaultValue='United States'
-														id='input-country'
-														placeholder='Country'
-														type='text'
-													/>
-												</FormGroup>
-											</Col>
-											<Col lg='4'>
-												<FormGroup>
-													<label
-														className='form-control-label'
-														htmlFor='input-country'>
-														Postal code
-													</label>
-													<Input
-														className='form-control-alternative'
-														id='input-postal-code'
-														placeholder='Postal code'
-														type='number'
-													/>
-												</FormGroup>
-											</Col>
-										</Row>
-									</div>
-									<hr className='my-4' />
-									{/* Description */}
-									<h6 className='heading-small text-muted mb-4'>About me</h6>
-									<div className='pl-lg-4'>
-										<FormGroup>
-											<label>About Me</label>
-											<Input
-												className='form-control-alternative'
-												placeholder='A few words about you ...'
-												rows='4'
-												defaultValue='A beautiful Dashboard for Bootstrap 4. It is Free and
-                          Open Source.'
-												type='textarea'
-											/>
-										</FormGroup>
 									</div>
 								</Form>
 							</CardBody>

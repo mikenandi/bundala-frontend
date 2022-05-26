@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React from "react";
 
 // reactstrap components
 import {Button, Container, Row, Col} from "reactstrap";
@@ -6,7 +6,7 @@ import {Button, Container, Row, Col} from "reactstrap";
 function UserHeader() {
 	return (
 		<>
-			<div className='header pb-8 pt-5 pt-lg-8 d-flex align-items-center'>
+			<div className='header pb-8 pt-2 pt-lg-8 d-flex align-items-center'>
 				{/* Mask */}
 				<span className='mask bg-gradient-default opacity-8' />
 				{/* Header container */}
@@ -15,13 +15,15 @@ function UserHeader() {
 						<Col lg='7' md='10'>
 							<h1 className='display-4 text-white'>Hello there</h1>
 							<p className='text-white mt-0 mb-5'>
-								please check your credentials as being used in our system.
+								This is your dashboard on usafi bills. Click the button bellow
+								if your trash is near full so as we can send the Car when there
+								are enought request from your street.
 							</p>
 							<Button
 								color='info'
 								href='#pablo'
 								onClick={(e) => e.preventDefault()}>
-								Edit profile
+								Send request
 							</Button>
 						</Col>
 					</Row>
