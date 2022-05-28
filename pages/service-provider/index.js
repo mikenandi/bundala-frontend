@@ -18,8 +18,29 @@ import Admin from "layouts/Admin.js";
 // core components
 import UserHeader from "./Header.js";
 import Navbar from "./Navbar.js";
+import axios from "axios";
 
 function Profile() {
+	// initializing states.
+	const [data, set_data] = React.useState({});
+	// fetching data from profile data.
+	React.useEffect(() => {
+		axios({
+			method: "GET",
+			url: "http://localhost:1337/api/v1/service-provider-profile",
+			params: {
+				user_id: localStorage.getItem("userId"),
+			},
+		})
+			.then((response) => {
+				set_data(response.data.data);
+				return;
+			})
+			.catch((error) => {
+				console.log(error.response.data);
+				return;
+			});
+	}, []);
 	return (
 		<>
 			<Navbar />
@@ -68,14 +89,15 @@ function Profile() {
 													<label
 														className='form-control-label'
 														htmlFor='input-username'>
-														Username
+														First name
 													</label>
 													<Input
-														className='form-control-alternative bg-white'
+														className='form-control-alternative bg-white text-dark'
 														defaultValue='lucky.jesse'
 														id='input-username'
-														placeholder='Username'
+														placeholder='First name'
 														type='text'
+														value={data.first_name}
 														disabled
 													/>
 												</FormGroup>
@@ -85,13 +107,14 @@ function Profile() {
 													<label
 														className='form-control-label'
 														htmlFor='input-email'>
-														Phone number
+														Last name
 													</label>
 													<Input
-														className='form-control-alternative bg-white'
+														className='form-control-alternative bg-white text-dark'
 														id='input-email'
-														placeholder='jesse@example.com'
+														placeholder='Last name'
 														type='email'
+														value={data.last_name}
 														disabled
 													/>
 												</FormGroup>
@@ -103,14 +126,14 @@ function Profile() {
 													<label
 														className='form-control-label'
 														htmlFor='input-first-name'>
-														First name
+														Phone number
 													</label>
 													<Input
-														className='form-control-alternative bg-white'
-														defaultValue='Lucky'
+														className='form-control-alternative bg-white text-dark'
 														id='input-first-name'
 														placeholder='First name'
 														type='text'
+														value={data.phone_no}
 														disabled
 													/>
 												</FormGroup>
@@ -120,14 +143,15 @@ function Profile() {
 													<label
 														className='form-control-label'
 														htmlFor='input-last-name'>
-														Last name
+														username
 													</label>
 													<Input
-														className='form-control-alternative bg-white'
-														defaultValue='Jesse'
+														className='form-control-alternative bg-white text-dark'
+														defaultValue='first name'
 														id='input-last-name'
-														placeholder='Last name'
+														placeholder='username'
 														type='text'
+														value={data.username}
 														disabled
 													/>
 												</FormGroup>
@@ -146,14 +170,15 @@ function Profile() {
 													<label
 														className='form-control-label'
 														htmlFor='input-address'>
-														control number
+														account number
 													</label>
 													<Input
-														className='form-control-alternative bg-white'
-														defaultValue='Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09'
+														className='form-control-alternative bg-white text-dark font-weight-bold font-size-12 input-large'
 														id='input-address'
-														placeholder='Home Address'
+														placeholder='control number'
 														type='text'
+														bsSize='lg'
+														value={data.account_number}
 														disabled
 													/>
 												</FormGroup>
@@ -165,14 +190,14 @@ function Profile() {
 													<label
 														className='form-control-label'
 														htmlFor='input-city'>
-														City
+														type
 													</label>
 													<Input
-														className='form-control-alternative bg-white'
-														defaultValue='New York'
+														className='form-control-alternative bg-white text-dark'
 														id='input-city'
-														placeholder='City'
+														placeholder='type'
 														type='text'
+														value={data.type}
 														disabled
 													/>
 												</FormGroup>
@@ -182,14 +207,14 @@ function Profile() {
 													<label
 														className='form-control-label'
 														htmlFor='input-country'>
-														district
+														charge amount
 													</label>
 													<Input
-														className='form-control-alternative bg-white'
-														defaultValue='United States'
+														className='form-control-alternative bg-white text-dark'
 														id='input-country'
-														placeholder='Country'
+														placeholder='Charge amount'
 														type='text'
+														value={data.charge_amount}
 														disabled
 													/>
 												</FormGroup>
@@ -199,29 +224,30 @@ function Profile() {
 													<label
 														className='form-control-label'
 														htmlFor='input-country'>
-														ward
-													</label>
-													<Input
-														className='form-control-alternative bg-white'
-														id='input-postal-code'
-														placeholder='Postal code'
-														type='text'
-														disabled
-													/>
-												</FormGroup>
-											</Col>
-											<Col lg='3'>
-												<FormGroup>
-													<label
-														className='form-control-label'
-														htmlFor='input-country'>
-														street
+														company name
 													</label>
 													<Input
 														className='form-control-alternative bg-white text-dark'
 														id='input-postal-code'
-														placeholder='Postal code'
-														value=''
+														placeholder='company name'
+														type='text'
+														value={data.company_name}
+														disabled
+													/>
+												</FormGroup>
+											</Col>
+											<Col lg='3'>
+												<FormGroup>
+													<label
+														className='form-control-label'
+														htmlFor='input-country'>
+														service
+													</label>
+													<Input
+														className='form-control-alternative bg-white text-dark'
+														id='input-postal-code'
+														placeholder='Service'
+														value={data.service}
 														type='text'
 														disabled
 													/>

@@ -8,6 +8,7 @@ function Header() {
 	// 🛒 setting up states
 	const [payers, set_payers] = React.useState("0");
 	const [streets, set_streets] = React.useState("0");
+	const [mothly_collection, set_monthly_collection] = React.useState("0");
 
 	// 🎲 getting data for filling the dashboard.
 	React.useEffect(() => {
@@ -16,6 +17,7 @@ function Header() {
 			url: "http://localhost:1337/api/v1/header-summary",
 		})
 			.then((response) => {
+				set_monthly_collection(response.data.data.monthly_collections);
 				set_streets(response.data.data.streets);
 				set_payers(response.data.data.payers);
 			})
@@ -44,7 +46,7 @@ function Header() {
 													monthly collections
 												</CardTitle>
 												<span className='h2 font-weight-bold mb-0'>
-													SH 350,897
+													SH {mothly_collection}
 												</span>
 											</div>
 											<Col className='col-auto'>

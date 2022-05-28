@@ -27,7 +27,10 @@ import axios from "axios";
 function Profile() {
 	// -- setting states
 	const [profile, set_profile] = React.useState({});
-	const [amount, set_amount] = React.useState("");
+	let [amount, set_amount] = React.useState("");
+	let [total_bill, set_total_bill] = React.useState("");
+	let [msg, set_msg] = React.useState("");
+	let [errmsg, set_errmsg] = React.useState("");
 
 	// handling change on form input
 	const handleChange = (e) => {
@@ -35,7 +38,99 @@ function Profile() {
 	};
 
 	// 🎲 function for triggering show modal or hide modal
-	const handlePay = () => {};
+	const handlePay = () => {
+		if (!amount) {
+			set_errmsg("no amount entered.");
+			setTimeout(() => {
+				set_errmsg("");
+			}, 5000);
+
+			return;
+		}
+
+		amount = Number(amount);
+
+		axios({
+			method: "PUT",
+			url: "http://localhost:1337/api/v1/pay-bill",
+			data: {
+				user_id: localStorage.getItem("userId"),
+				amount: amount,
+			},
+		})
+			.then((response) => {
+				console.log(response.data.data);
+				set_msg(
+					`successfull payment, your bill now is ${response.data.data.bill_now}`,
+				);
+				setTimeout(() => {
+					set_msg("");
+					set_amount("");
+				}, 5000);
+
+				return;
+			})
+			.catch((error) => {
+				if (error.response) {
+					set_errmsg(error.response.data.message);
+					setTimeout(() => {
+						set_errmsg("");
+					}, 5000);
+				}
+
+				return;
+			});
+	};
+
+	// 👇 a fetching total bill.
+	React.useEffect(() => {
+		axios({
+			method: "GET",
+			url: "http://localhost:1337/api/v1/total-user-bill",
+			params: {
+				user_id: localStorage.getItem("userId"),
+			},
+		})
+			.then((response) => {
+				set_total_bill(response.data.data.total_bill);
+				return;
+			})
+			.catch((error) => {
+				console.log(error.response);
+				return;
+			});
+	}, []);
+
+	// amount = Number(amount);
+	// 🎲 getting values for user profile.
+	React.useEffect(() => {
+		axios({
+			method: "GET",
+			url: "http://localhost:1337/api/v1/payer-profile",
+			params: {
+				user_id: localStorage.getItem("userId"),
+				amount: amount,
+			},
+		})
+			.then((response) => {
+				set_profile({
+					first_name: response.data.data.first_name,
+					last_name: response.data.data.last_name,
+					username: response.data.data.username,
+					phone_no: response.data.data.phone_no,
+					control_no: response.data.data.control_number,
+					city: response.data.data.city,
+					district: response.data.data.district,
+					ward: response.data.data.ward,
+					street: response.data.data.street,
+				});
+				return;
+			})
+			.catch((error) => {
+				console.log(error.response);
+				return;
+			});
+	}, []);
 
 	// 🎲 getting values for user profile.
 	React.useEffect(() => {
@@ -44,6 +139,7 @@ function Profile() {
 			url: "http://localhost:1337/api/v1/payer-profile",
 			params: {
 				user_id: localStorage.getItem("userId"),
+				amount: amount,
 			},
 		})
 			.then((response) => {
@@ -64,7 +160,7 @@ function Profile() {
 				console.log(error.response);
 			});
 	}, []);
-	console.log(amount);
+
 	return (
 		<>
 			<Navbar />
@@ -76,7 +172,25 @@ function Profile() {
 						<Card className='card-profile shadow'>
 							<CardBody className='pt-0 pt-md-4'>
 								<div className='mt-2 text-center'>
-									<h3 className='display-3'>tsh 12,500</h3>
+									{
+										// for success.
+										msg && (
+											<div class='alert alert-success' role='alert'>
+												{msg}
+											</div>
+										)
+									}
+
+									{
+										// for failure.
+										errmsg && (
+											<div class='alert alert-danger' role='alert'>
+												{errmsg}
+											</div>
+										)
+									}
+
+									<h3 className='display-3'>tsh {total_bill}</h3>
 									<div className='h5 font-weight-400 text-uppercase'>
 										total bill
 									</div>
@@ -109,7 +223,7 @@ function Profile() {
 											notifications{" "}
 										</p>
 									</div>
-									<div>Car will pass to your street tommorow.</div>
+									<div>no notifications.</div>
 								</div>
 							</CardBody>
 						</Card>

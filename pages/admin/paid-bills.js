@@ -27,7 +27,7 @@ import Admin from "layouts/Admin.js";
 import Header from "components/Headers/Header.js";
 import axios from "axios";
 
-function Tables() {
+function PaidBills() {
 	// 🧺 setting states
 	const [answer, setanswer] = React.useState("");
 	const [data, setdata] = React.useState([]);
@@ -46,13 +46,12 @@ function Tables() {
 			},
 		})
 			.then((response) => {
-				// console.log(response.data.data);
-				console.log(response.data.data);
-				setdata([]);
 				setdata(response.data.data);
+				return;
 			})
 			.catch((error) => {
 				console.log(error.response);
+				return;
 			});
 	}, [answer]);
 
@@ -112,6 +111,6 @@ function Tables() {
 	);
 }
 
-Tables.layout = Admin;
+PaidBills.layout = Admin;
 
-export default Tables;
+export default PaidBills;

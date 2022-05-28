@@ -93,15 +93,19 @@ function Maps() {
 								service: "",
 							});
 						}, 5000);
+						return;
 					}
+					return;
 				})
 				.catch((error) => {
 					if (error.response) {
 						set_errmsg(error.response.data.message);
 						setTimeout(() => {
 							set_errmsg("");
-						}, 10000);
+						}, 4000);
 					}
+
+					return;
 				});
 		} else {
 			set_errmsg("please fill all fields before submiting.");
@@ -109,6 +113,8 @@ function Maps() {
 			setTimeout(() => {
 				set_errmsg("");
 			}, 5000);
+
+			return;
 		}
 	};
 	console.log(answer);
@@ -119,16 +125,24 @@ function Maps() {
 			{/* Page content */}
 			<Container className='mt-5' fluid>
 				<Form className='form col-lg-6 offset-lg-3'>
-					{msg && (
-						<div class='alert alert-success' role='alert'>
-							{msg}
-						</div>
-					)}
-					{errmsg && (
-						<div class='alert alert-danger' role='alert'>
-							{errmsg}
-						</div>
-					)}
+					{
+						// success message alert
+						msg && (
+							<div class='alert alert-success' role='alert'>
+								{msg}
+							</div>
+						)
+					}
+					{/* 🎲 */}
+					{
+						// error message alert.
+						errmsg && (
+							<div class='alert alert-danger' role='alert'>
+								{errmsg}
+							</div>
+						)
+					}
+					{/* inputs on the form. */}
 					<FormGroup>
 						<Label>First name</Label>
 						<Input
@@ -212,7 +226,7 @@ function Maps() {
 							onChange={handleChange}
 							value={answer.service}>
 							<option></option>
-							<option>garbage truck</option>
+							<option>cleanes truck</option>
 							<option>security guard</option>
 						</Input>
 					</FormGroup>

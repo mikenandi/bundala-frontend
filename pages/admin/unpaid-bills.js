@@ -27,34 +27,30 @@ import Admin from "layouts/Admin.js";
 import Header from "components/Headers/Header.js";
 import axios from "axios";
 
-function Tables() {
+function UnpaidBills() {
 	// 🧺 setting states
 	const [answer, setanswer] = React.useState("");
 	const [data, setdata] = React.useState([]);
 
-	const handleChange = (e) => {
-		let value = e.target.value;
-		setanswer(value);
-	};
-
 	React.useEffect(() => {
 		axios({
 			method: "GET",
-			url: "http://localhost:1337/api/v1/search-location",
+			url: "http://localhost:1337/api/v1/search-unpaid-bills",
 			params: {
 				query: answer,
 			},
 		})
 			.then((response) => {
 				// console.log(response.data.data);
-				console.log(response.data.data);
-				setdata([]);
-				setdata(response.data.data);
+
+				setdata(response.data.data.results);
+				return;
 			})
 			.catch((error) => {
-				console.log(error.response);
+				console.log(error.response.data);
+				return;
 			});
-	}, [answer]);
+	}, []);
 
 	return (
 		<>
@@ -66,22 +62,22 @@ function Tables() {
 					<div className='col'>
 						<Card className='shadow'>
 							<CardHeader className='border-0'>
-								<Input
+								{/* <Input
 									type='text'
 									className='text-dark w-75'
 									placeholder='search your location code here.....'
 									onChange={handleChange}
 									value={answer}
-								/>
+								/> */}
 							</CardHeader>
 							<Table className='align-items-center table-flush' responsive>
 								<thead className='thead-light'>
 									<tr>
-										<th scope='col'>Region</th>
-										<th scope='col'>District</th>
-										<th scope='col'>Ward</th>
+										<th scope='col'>First Name</th>
+										<th scope='col'>Last Name</th>
+										<th scope='col'>Amount</th>
 										<th scope='col'>Street</th>
-										<th scope='col'>Street code</th>
+										<th scope='col'>Ward</th>
 										<th scope='col' />
 									</tr>
 								</thead>
@@ -91,13 +87,16 @@ function Tables() {
 											<tr key={item.id}>
 												<th scope='row'>
 													<Media className='align-items-center'>
-														<span className='mb-0 text-sm'>{item.region}</span>
+														<span className='mb-0 text-sm'>
+															<td>{item.first_name}</td>
+														</span>
 													</Media>
 												</th>
-												<td>{item.district}</td>
-												<td>{item.ward}</td>
+
+												<td>{item.last_name}</td>
+												<td>{item.amount}</td>
 												<td>{item.street}</td>
-												<td>{item.street_code}</td>
+												<td>{item.ward}</td>
 											</tr>
 										);
 									})}
@@ -112,6 +111,6 @@ function Tables() {
 	);
 }
 
-Tables.layout = Admin;
+UnpaidBills.layout = Admin;
 
-export default Tables;
+export default UnpaidBills;

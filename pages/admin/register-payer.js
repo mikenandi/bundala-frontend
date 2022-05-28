@@ -73,7 +73,7 @@ function RegisterPayer() {
 								house_number: "",
 								street_code: "",
 							});
-						}, 5000);
+						}, 4000);
 					}
 				})
 				.catch((error) => {
@@ -82,7 +82,7 @@ function RegisterPayer() {
 
 						setTimeout(() => {
 							set_errmsg("");
-						}, 10000);
+						}, 4000);
 					}
 				});
 		} else {
@@ -90,11 +90,10 @@ function RegisterPayer() {
 
 			setTimeout(() => {
 				set_errmsg("");
-			}, 9000);
+			}, 3000);
 		}
 	};
 
-	console.log(answer);
 	return (
 		<>
 			<Header />
@@ -148,7 +147,7 @@ function RegisterPayer() {
 							<option>normal house</option>
 							<option>house with tenant</option>
 							<option>hotel</option>
-							<option>small bussness</option>
+							<option>small business</option>
 						</Input>
 					</FormGroup>
 

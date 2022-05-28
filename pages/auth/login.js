@@ -80,13 +80,13 @@ function Login() {
 							set_errmsg("wrong password");
 							setTimeout(() => {
 								set_errmsg("");
-							}, 10000);
+							}, 5000);
 						}
 						if (error.response.data.code === "username_not_found") {
 							set_errmsg("wrong username");
 							setTimeout(() => {
 								set_errmsg("");
-							}, 10000);
+							}, 5000);
 						}
 					}
 				});

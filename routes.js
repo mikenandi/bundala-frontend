@@ -6,11 +6,23 @@ var routes = [
 		layout: "/admin",
 	},
 	{
-		path: "/register-location",
-		name: "Register location",
-		icon: "ni ni-pin-3 text-info",
+		path: "/tables",
+		name: "Street codes",
+		icon: "ni ni-bullet-list-67 text-info",
 		layout: "/admin",
 	},
+	{
+		path: "/unpaid-bills",
+		name: "unpaid bills",
+		icon: "ni ni-map-big text-info",
+		layout: "/admin",
+	},
+	// {
+	// 	path: "/paid-bills",
+	// 	name: "paid bills",
+	// 	icon: "ni ni-tag text-info",
+	// 	layout: "/admin",
+	// },
 	{
 		path: "/profile",
 		name: "User Profile",
@@ -18,11 +30,12 @@ var routes = [
 		layout: "/admin",
 	},
 	{
-		path: "/tables",
-		name: "Street codes",
-		icon: "ni ni-bullet-list-67 text-info",
+		path: "/register-location",
+		name: "Register location",
+		icon: "ni ni-pin-3 text-info",
 		layout: "/admin",
 	},
+
 	{
 		path: "/register-payer",
 		name: "Register payer",

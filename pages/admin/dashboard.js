@@ -23,18 +23,124 @@ import {
 // layout for this page
 import Admin from "layouts/Admin.js";
 // core components
-import {
-	chartOptions,
-	parseOptions,
-	chartExample1,
-	chartExample2,
-} from "variables/charts.js";
+import {chartOptions, parseOptions} from "variables/charts.js";
 
 import Header from "components/Headers/Header.js";
+import axios from "axios";
 
 const Dashboard = (props) => {
+	// setting up states.
 	const [activeNav, setActiveNav] = React.useState(1);
 	const [chartExample1Data, setChartExample1Data] = React.useState("data1");
+	const [data, set_data] = React.useState([]);
+	const [requests, set_requests] = React.useState([]);
+
+	// 🟨 getting up requests.
+	React.useEffect(() => {
+		axios({method: "GET", url: "http://localhost:1337/api/v1/total-requests"})
+			.then((response) => {
+				//    updating state of requests
+				set_requests(response.data.data.requests);
+				return;
+			})
+			.catch((error) => {
+				console.log(error.response.data);
+				return;
+			});
+	}, []);
+
+	// getting data from the backend.
+	React.useEffect(() => {
+		axios({
+			method: "GET",
+			url: "http://localhost:1337/api/v1/line-chart-data",
+		})
+			.then((response) => {
+				// console.log(response.data);
+				set_data([
+					Math.floor(response.data.data.jan / 1000),
+					Math.floor(response.data.data.feb / 1000),
+					Math.floor(response.data.data.mar / 1000),
+					Math.floor(response.data.data.apr / 1000),
+					Math.floor(response.data.data.may / 1000),
+					Math.floor(response.data.data.jun / 1000),
+					Math.floor(response.data.data.jly / 1000),
+					Math.floor(response.data.data.aug / 1000),
+					Math.floor(response.data.data.sep / 1000),
+					Math.floor(response.data.data.oct / 1000),
+					Math.floor(response.data.data.nov / 1000),
+					Math.floor(response.data.data.dec / 1000),
+				]);
+				return;
+			})
+			.catch((error) => {
+				console.log(error.response);
+				return;
+			});
+	}, []);
+
+	// 💹 line graph set up.
+	let chartExample1 = {
+		options: {
+			scales: {
+				yAxes: [
+					{
+						gridLines: {
+							color: "#212529",
+							zeroLineColor: "#212529",
+						},
+						ticks: {
+							callback: function (value) {
+								if (!(value % 10)) {
+									return "" + value + "k";
+								}
+							},
+						},
+					},
+				],
+			},
+			tooltips: {
+				callbacks: {
+					label: function (item, data) {
+						var label = data.datasets[item.datasetIndex].label || "";
+						var yLabel = item.yLabel;
+						var content = "";
+
+						if (data.datasets.length > 1) {
+							content += label;
+						}
+
+						content += "" + yLabel + "k";
+						return content;
+					},
+				},
+			},
+		},
+		data1: (canvas) => {
+			return {
+				labels: [
+					"Jan",
+					"Feb",
+					"Mar",
+					"Apr",
+					"May",
+					"Jun",
+					"Jul",
+					"Aug",
+					"Sep",
+					"Oct",
+					"Nov",
+					"Dec",
+				],
+				datasets: [
+					{
+						label: "Performance",
+						data: data,
+					},
+				],
+			};
+		},
+	};
 
 	if (window.Chart) {
 		parseOptions(Chart, chartOptions());
@@ -45,8 +151,6 @@ const Dashboard = (props) => {
 		setActiveNav(index);
 		setChartExample1Data("data" + index);
 	};
-	// let token = localStorage.getItem("authToken");
-	// console.log(token);
 
 	return (
 		<>
@@ -77,18 +181,6 @@ const Dashboard = (props) => {
 													<span className='d-md-none'>M</span>
 												</NavLink>
 											</NavItem>
-											<NavItem>
-												<NavLink
-													className={classnames("py-2 px-3", {
-														active: activeNav === 2,
-													})}
-													data-toggle='tab'
-													href='#pablo'
-													onClick={(e) => toggleNavs(e, 2)}>
-													<span className='d-none d-md-block'>Week</span>
-													<span className='d-md-none'>W</span>
-												</NavLink>
-											</NavItem>
 										</Nav>
 									</div>
 								</Row>
@@ -105,15 +197,14 @@ const Dashboard = (props) => {
 							</CardBody>
 						</Card>
 					</Col>
+
+					{/* trash car requests. */}
 					<Col xl='4'>
 						<Card className='shadow'>
 							<CardHeader className='bg-transparent'>
 								<Row className='align-items-center'>
 									<div className='col'>
-										<h6 className='text-uppercase text-mutted ls-1 mb-1'>
-											Garbage car quest
-										</h6>
-										<h2 className='mb-0'>Total orders</h2>
+										<h2 className='mb-0'>Request per street</h2>
 									</div>
 								</Row>
 							</CardHeader>
@@ -130,220 +221,23 @@ const Dashboard = (props) => {
 										</tr>
 									</thead>
 									<tbody>
-										<tr>
-											<td>Mark</td>
-											<td>100</td>
-										</tr>
-										<tr>
-											<td>Jacob</td>
-											<td>200</td>
-										</tr>
-										<tr>
-											<td>Larry</td>
-											<td>400</td>
-										</tr>
-										<tr>
-											<td>Larry</td>
-											<td>400</td>
-										</tr>
-										<tr>
-											<td>Larry</td>
-											<td>400</td>
-										</tr>
-										<tr>
-											<td>Larry</td>
-											<td>400</td>
-										</tr>
+										{
+											// creating rows of the table.
+											requests.map((request) => {
+												return (
+													<tr key={request.id}>
+														<td>{request.street}</td>
+														<td>{request.count}</td>
+													</tr>
+												);
+											})
+										}
 									</tbody>
 								</table>
 							</CardBody>
 						</Card>
 					</Col>
 				</Row>
-				{/* <Row className='mt-5'>
-					<Col className='mb-5 mb-xl-0' xl='8'>
-						<Card className='shadow'>
-							<CardHeader className='border-0'>
-								<Row className='align-items-center'>
-									<div className='col'>
-										<h3 className='mb-0'>Page visits</h3>
-									</div>
-									<div className='col text-right'>
-										<Button
-											color='primary'
-											href='#pablo'
-											onClick={(e) => e.preventDefault()}
-											size='sm'>
-											See all
-										</Button>
-									</div>
-								</Row>
-							</CardHeader> */}
-				{/* <Table className='align-items-center table-flush' responsive>
-								<thead className='thead-light'>
-									<tr>
-										<th scope='col'>Page name</th>
-										<th scope='col'>Visitors</th>
-										<th scope='col'>Unique users</th>
-										<th scope='col'>Bounce rate</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<th scope='row'>/argon/</th>
-										<td>4,569</td>
-										<td>340</td>
-										<td>
-											<i className='fas fa-arrow-up text-success mr-3' /> 46,53%
-										</td>
-									</tr>
-									<tr>
-										<th scope='row'>/argon/index.html</th>
-										<td>3,985</td>
-										<td>319</td>
-										<td>
-											<i className='fas fa-arrow-down text-warning mr-3' />{" "}
-											46,53%
-										</td>
-									</tr>
-									<tr>
-										<th scope='row'>/argon/charts.html</th>
-										<td>3,513</td>
-										<td>294</td>
-										<td>
-											<i className='fas fa-arrow-down text-warning mr-3' />{" "}
-											36,49%
-										</td>
-									</tr>
-									<tr>
-										<th scope='row'>/argon/tables.html</th>
-										<td>2,050</td>
-										<td>147</td>
-										<td>
-											<i className='fas fa-arrow-up text-success mr-3' /> 50,87%
-										</td>
-									</tr>
-									<tr>
-										<th scope='row'>/argon/profile.html</th>
-										<td>1,795</td>
-										<td>190</td>
-										<td>
-											<i className='fas fa-arrow-down text-danger mr-3' />{" "}
-											46,53%
-										</td>
-									</tr>
-								</tbody>
-							</Table>
-						</Card>
-					</Col>
-					<Col xl='4'>
-						<Card className='shadow'>
-							<CardHeader className='border-0'>
-								<Row className='align-items-center'>
-									<div className='col'>
-										<h3 className='mb-0'>Social traffic</h3>
-									</div>
-									<div className='col text-right'>
-										<Button
-											color='primary'
-											href='#pablo'
-											onClick={(e) => e.preventDefault()}
-											size='sm'>
-											See all
-										</Button>
-									</div>
-								</Row>
-							</CardHeader>
-							<Table className='align-items-center table-flush' responsive>
-								<thead className='thead-light'>
-									<tr>
-										<th scope='col'>Referral</th>
-										<th scope='col'>Visitors</th>
-										<th scope='col' />
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<th scope='row'>Facebook</th>
-										<td>1,480</td>
-										<td>
-											<div className='d-flex align-items-center'>
-												<span className='mr-2'>60%</span>
-												<div>
-													<Progress
-														max='100'
-														value='60'
-														barClassName='bg-gradient-danger'
-													/>
-												</div>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<th scope='row'>Facebook</th>
-										<td>5,480</td>
-										<td>
-											<div className='d-flex align-items-center'>
-												<span className='mr-2'>70%</span>
-												<div>
-													<Progress
-														max='100'
-														value='70'
-														barClassName='bg-gradient-success'
-													/>
-												</div>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<th scope='row'>Google</th>
-										<td>4,807</td>
-										<td>
-											<div className='d-flex align-items-center'>
-												<span className='mr-2'>80%</span>
-												<div>
-													<Progress max='100' value='80' />
-												</div>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<th scope='row'>Instagram</th>
-										<td>3,678</td>
-										<td>
-											<div className='d-flex align-items-center'>
-												<span className='mr-2'>75%</span>
-												<div>
-													<Progress
-														max='100'
-														value='75'
-														barClassName='bg-gradient-info'
-													/>
-												</div>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<th scope='row'>twitter</th>
-										<td>2,645</td>
-										<td>
-											<div className='d-flex align-items-center'>
-												<span className='mr-2'>30%</span>
-												<div>
-													<Progress
-														max='100'
-														value='30'
-														barClassName='bg-gradient-warning'
-													/>
-												</div>
-											</div>
-										</td>
-									</tr>
-								</tbody>
-							</Table>
-						</Card>
-					</Col>
-				</Row> */}
 			</Container>
 		</>
 	);

@@ -13,11 +13,8 @@ function UserHeader() {
 				<Container className='d-flex align-items-center' fluid>
 					<Row>
 						<Col lg='7' md='10'>
-							<h1 className='display-4 text-white'>Hello there</h1>
-							<p className='text-white mt-0 mb-5'>
-								Click the button bellow if your trash is near full so as we can
-								send the Car when there are enought request from your street.
-							</p>
+							{/* <h1 className='display-4 text-white'>Hello there</h1>
+							<p className='text-white mt-0 mb-5'>.</p> */}
 						</Col>
 					</Row>
 				</Container>
